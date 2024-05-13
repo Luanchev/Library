@@ -58,7 +58,7 @@ public class LibroService {
 
     }
 
-    // este servicio lo podemos usar para crear y actualizar los libros
+    // este servicio lo podemos usar para crear los libros
     public ResponseEntity<Object> createLibro(Libro libro) {
         //antes de crear un nuevo libro debemos de validar si el producto ya existe
         Optional<Libro> res = libroRepository.findLibroByTitulo(libro.getTitulo());
@@ -96,6 +96,39 @@ public class LibroService {
                 HttpStatus.CREATED
         );
     }
+
+    //Servicio para actualizar libro
+    public ResponseEntity<Object> updateLibro(int id_libro, Libro libro) {
+        Optional<Libro> libroExistenteAux = libroRepository.findById(id_libro);
+        if (libroExistenteAux.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró un libro con el ID proporcionado");
+        }
+
+        Libro libroExistenteAct = libroExistenteAux.get();
+
+        // Actualiza los campos del libro existente con los valores proporcionados en el cuerpo de la solicitud
+        libroExistenteAct.setTitulo(libro.getTitulo());
+        libroExistenteAct.setAutor(libro.getAutor());
+        libroExistenteAct.setAnio_publicacion(libro.getAnio_publicacion());
+
+        // Valida y actualiza el género del libro si es necesario
+        if (libro.getGenero() != null && libro.getGenero().getId_genero() != null) {
+            Optional<Genero> generoOptional = generoRepository.findById(libro.getGenero().getId_genero());
+            if (generoOptional.isPresent()) {
+                libroExistenteAct.setGenero(generoOptional.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("El género especificado para el libro no existe debe de ser del 1 al 5");
+            }
+        }
+
+        // Guarda el libro actualizado en la base de datos
+        libroRepository.save(libroExistenteAct);
+
+        return ResponseEntity.ok(libroExistenteAct);
+    }
+
 
     //servicio para eliminar libros
     public ResponseEntity<Object>deleteLibro(int id_libro){

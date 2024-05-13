@@ -37,9 +37,9 @@ public class LibroController {
         return this.libroService.createLibro(libro);
     }
     //MetodoPut
-    @PutMapping("/actualizarlibro/")
-    public ResponseEntity<Object> actualizarLibro(@RequestBody Libro libro){
-        return this.libroService.createLibro(libro);
+    @PutMapping("/actualizarlibro/{id_libro}")
+    public ResponseEntity<Object> actualizarLibro(@PathVariable int id_libro,@RequestBody Libro libro){
+        return this.libroService.updateLibro(id_libro,libro);
     }
     @DeleteMapping(path = "/eliminarlibro/{id_libro}")
     public ResponseEntity<Object> eliminarLibro(@PathVariable("id_libro") int id_libro){
